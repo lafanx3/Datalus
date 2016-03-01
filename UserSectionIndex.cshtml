@@ -1,0 +1,1079 @@
+
+@{
+    ViewBag.Title = "Section Registration";
+}
+
+<h2>User Sections</h2>
+
+<div class="panel-heading" ng-include="'/userSections.html'"></div>
+
+<script type="text/ng-template" id="/userSections.html">
+<ul class="nav nav-tabs" ng-controller="routeController as main">
+    <li ng-class="main.tabClass(tab)" ng-repeat="tab in main.tabs">
+        <a href="{{tab.link}}" ng-click="main.setSelectedTab(tab)">{{tab.label}}</a>
+    </li>
+</ul>
+</script>
+<!--this html for angular routing-->
+<div data-init-panel="true" class="panel fade in panel-default panel-fill" data-fill-color="true">
+    <div class="panel-heading">
+        <div ng-view></div>
+    </div>
+</div>
+
+<!--View for users tab-->
+<script type="text/ng-template" id="/templates/users.html">
+    <form id="userRegistrationForm" name="userController.userRegistrationForm" novalidate>
+        <label class="control-label" for="UserProfileId">Students:<strong> {{$selection_made.firstName}} {{$selection_made.lastName}}</strong></label>
+        <input type="text"
+               data-ng-model="userController.userProfileSelection.userProfileId"
+               placeholder="Enter First Name, Last Name or email address"
+               uib-typeahead="userProfile.id as (userProfile.firstName + ' ' + userProfile.lastName + ' ' + userProfile.userName) for userProfile in userController.userProfiles | filter:$viewValue"
+               typeahead-loading="loadingProfile"
+               typeahead-no-results="noResults"
+               typeahead-on-select='onSelect($item, $model, $label)'
+               typeahead-input-formatter="userController.selectedUser(userController.userProfileSelection.userProfileId)"
+               typeahead-append-to-body="true"
+               typeahead-min-length=2
+               class="form-control">
+        <i ng-show="loadingProfile"
+           class="glyphicon glyphicon-refresh"></i>
+        <div ng-show="noResults">
+            <i class="glyphicon glyphicon-remove"></i> No Results Found
+        </div>
+        <br />
+
+        <div class="form-group">
+            <label class="control-label" for="sectionId">Sections:</label>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Section Number</th>
+                        <th>Section Name</th>
+                        <th>Enrollment Status</th>
+                        <th>Is For Credit</th>
+                        <th>Comment</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="section in userController.sections">
+                        <td>{{section.section.sectionNumberId}}</td>
+                        <td>{{section.section.title}}</td>
+                        <td>{{section.enrollmentStatusId}}</td>
+                        <td><input type="checkbox" ng-checked="{{section.isForCredit}}" disabled /></td>
+                        <td>{{section.comment}}</td>
+                        <td><button class="btn-block btn-success" type="button" ng-click="userController.onEdit(userController.userProfileSelection.userProfileId, section.sectionId)">Edit</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <div ng-controller="formStudentController as dashboard">
+        <button type="button" ng-if="!dashboard.formVisibility" ng-click="dashboard.showForm()" class="btn btn-info">Add Student</button>
+        <div data-init-panel="true" class="panel fade in panel-default panel-fill" data-fill-color="true">
+            <div class="panel-heading" ng-if="dashboard.formVisibility" ng-include="'/formStudent.html'">
+
+            </div>
+        </div>
+    </div>
+
+</script>
+
+<!--View for sections tab-->
+<script type="text/ng-template" id="/templates/sections.html">
+    <form id="sectionRegistrationForm" name="sectionController.sectionRegistrationForm" novalidate>
+        <div class="panel-control pull-right">
+            <div data-init-panel="true" class="panel fade in panel-dark" data-context="dark">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Max Capacity</h4>
+                </div><!-- /.panel-heading -->
+                <div class="panel-body">
+                    <strong><p class="text-center panel-title">{{sectionController.capacity}}</p></strong>
+                </div><!-- /.panel-body -->
+            </div><!-- /.panel -->
+        </div>
+        <div class="panel-control pull-right">
+            <div data-init-panel="true" class="panel fade in panel-dark" data-context="dark">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Seats Available</h4>
+                </div><!-- /.panel-heading -->
+                <div class="panel-body">
+                    <strong><p class="text-center panel-title">{{sectionController.availableSeats}}</p></strong>
+                </div><!-- /.panel-body -->
+            </div><!-- /.panel -->
+        </div>
+        <div class="row">
+            <div class="form-group col-md-5">
+                <label class="control-label" for="sectionId">Sections:</label>
+                <select name="sectionId" class="form-control"
+                        id="sectionId"
+                        ng-model="sectionController.sectionSelection.sectionId"
+                        ng-options="section.id as (section.id + ' ' + section.title) for section in sectionController.sections"
+                        ng-change="sectionController.selectedSection(sectionController.sectionSelection.sectionId)">
+                    <option value="">Select a Section</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="sectionId">Students:</label>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Enrollment Status</th>
+                        <th>Comment</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="userProfile in sectionController.userProfiles">
+                        <td>{{userProfile.student.firstName}}</td>
+                        <td>{{userProfile.student.lastName}}</td>
+                        <td>{{userProfile.enrollmentStatusId}}</td>
+                        <td>{{userProfile.comment}}</td>
+                        <td><button class="btn-block btn-success" type="button" ng-click="sectionController.onEdit(userProfile.userProfileId, userProfile.sectionId)">Edit</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <div ng-controller="formSectionController as dashboard">
+        <button type="button" ng-if="!dashboard.formVisibility" ng-click="dashboard.showForm()" class="btn btn-info">Add Student</button>
+        <div data-init-panel="true" class="panel fade in panel-default panel-fill" data-fill-color="true">
+            <div class="panel-heading" ng-if="dashboard.formVisibility" ng-include="'/formSection.html'">
+
+            </div>
+        </div>
+    </div>
+</script>
+
+<!--Registration form for students tab-->
+<script type="text/ng-template" id="/formStudent.html">
+
+    <form id="studentRegistrationForm" name="dashboard.studentRegistrationForm" ng-submit="dashboard.onRegisterStudent()" novalidate>
+
+        <div class="form-group">
+            <label class="control-label" for="UserProfileId">User Profile ID:</label>
+            <select name="userProfileId" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.userProfileId.$valid}"
+                    id="userProfileId"
+                    ng-model="dashboard.registerNewStudent.userProfileId"
+                    ng-options="userProfile.id as (userProfile.firstName + ' ' + userProfile.lastName) for userProfile in dashboard.userProfiles"
+                    required>
+                <option value="">Select a Profile</option>
+            </select>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.userProfileId.$error.required">Must select a user.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="sectionId">Section ID:</label>
+            <select name="sectionId" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.SectionId.$valid}"
+                    id="sectionId"
+                    ng-model="dashboard.registerNewStudent.SectionId"
+                    ng-options="section.id as (section.sectionNumberId + ':   ' + section.title) for section in dashboard.sections"
+                    required>
+                <option value="">Select a Section</option>
+            </select>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.sectionId.$error.required">Must select a section.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="enrollmentStatus">Enrollment Status:</label>
+            <select name="enrollmentStatus" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.EnrollmentStatusId.$valid}" ng-model="dashboard.registerNewStudent.EnrollmentStatusId" required>
+                <option value="">Select a Status</option>
+                <option>Requested</option>
+                <option>Approved</option>
+                <option>Waitlisted</option>
+                <option>Enrolled</option>
+                <option>Withdrawn</option>
+                <option>Completed</option>
+            </select>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.enrollmentStatus.$error.required">Select enrollment status</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="isForCredit">Is For Credit:</label>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="input-group">
+                        <select name="isForCredit" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.IsForCredit.$valid}" ng-model="dashboard.registerNewStudent.IsForCredit" required>
+                            <option value="True">Yes</option>
+                            <option value="False">No</option>
+                        </select><br>
+                    </p>
+                </div>
+            </div>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.isForCredit.$error.required">Select credit yes/no.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="comment">Comment:</label>
+            <textarea type="text" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.Comment.$valid}"
+                      placeholder="Comment"
+                      name="comment"
+                      id="comment"
+                      ng-model="dashboard.registerNewStudent.Comment"
+                      ng-minlength="2"
+                      required></textarea>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.comment.$error.required">Provide a comment.</span>
+            </div>
+        </div>
+        <button type="submit" id="cmdWiki" class="btn btn-success">Add</button>
+        <button type="button" class="btn btn-default" ng-click="dashboard.resetForm()">Cancel</button>
+    </form>
+
+
+</script>
+
+<!--Registration form for sections tab-->
+<script type="text/ng-template" id="/formSection.html">
+    <form id="studentRegistrationForm" name="dashboard.studentRegistrationForm" ng-submit="dashboard.onRegisterStudent()" novalidate>
+        <div class="form-group">
+            <label class="control-label" for="UserProfileId">User Profile ID:</label>
+            <select name="userProfileId" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.userProfileId.$valid}"
+                    id="userProfileId"
+                    ng-model="dashboard.registerNewStudent.userProfileId"
+                    ng-options="userProfile.id as (userProfile.firstName + ' ' + userProfile.lastName) for userProfile in dashboard.userProfiles"
+                    ng-change="userController.selectedUser(userController.userProfileSelection.userProfileId)" required>
+                <option value="">Select a Profile</option>
+            </select>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.userProfileId.$error.required">Must select a user.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="sectionId">Section ID:</label>
+            <select name="sectionId" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.sectionId.$valid}"
+                    id="sectionId"
+                    ng-model="dashboard.registerNewStudent.SectionId"
+                    ng-options="section.id as (section.sectionNumberId + ':   ' + section.title) for section in dashboard.sections" required>
+                <option value="">Select a Section</option>
+            </select>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.sectionId.$error.required">Must select a section.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="enrollmentStatus">Enrollment Status:</label>
+            <p class="input-group">
+                <select name="enrollmentStatus" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.enrollmentStatus.$valid}" ng-model="dashboard.registerNewStudent.EnrollmentStatusId" required>
+                    <option value="">Select a Status</option>
+                    <option>Requested</option>
+                    <option>Approved</option>
+                    <option>Waitlisted</option>
+                    <option>Enrolled</option>
+                    <option>Withdrawn</option>
+                    <option>Completed</option>
+                </select>
+                <div role="alert" class="help-inline error">
+                    <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.enrollmentStatus.$error.required">Must select an enrollment status.</span>
+                </div>
+            </p>
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label" for="comment">Comment:</label>
+            <textarea type="text" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.comment.$valid}"
+                      placeholder="Comment"
+                      name="comment"
+                      id="comment"
+                      ng-model="dashboard.registerNewStudent.Comment"
+                      ng-minlength="2"
+                      required></textarea>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.comment.$error.required">Must provide a comment.</span>
+            </div>
+        </div>
+
+        <button type="submit" id="cmdWiki" class="btn btn-success">Add</button>
+        <button type="button" class="btn btn-default" ng-click="dashboard.resetForm()">Cancel</button>
+    </form>
+</script>
+
+<!--Edit modal window form for students tab-->
+<script type="text/ng-template" id="modalUserContent.html">
+    <form id="mStudentRegistrationForm" name="mUserEdit.mStudentRegistrationForm" ng-submit="mUserEdit.ok()" novalidate>
+        <div class="modal-header">
+            <h3 class="modal-title">Edit</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="control-label" for="enrollmentStatus">Enrollment Status:</label>
+                <p class="input-group">
+                    <select placeholder="Select status" name="enrollmentStatus" class="form-control ng-class:{'error':mUserEdit.showFormErrors && !mUserEdit.mStudentRegistrationForm.enrollmentStatus.$valid}" ng-model="mUserEdit.userData.enrollmentStatusId" required>
+                        <option>Requested</option>
+                        <option>Approved</option>
+                        <option>Waitlisted</option>
+                        <option>Enrolled</option>
+                        <option>Withdrawn</option>
+                        <option>Completed</option>
+                    </select><br>
+                    <div role="alert" class="help-inline error">
+                        <span class="error" data-ng-show="mUserEdit.showFormErrors && mUserEdit.mStudentRegistrationForm.enrollmentStatus.$error.required">Select enrollment status.</span>
+                    </div>
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="isForCredit">Is For Credit:</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="input-group">
+                            <select name="isForCredit" class="form-control ng-class:{'error':mUserEdit.showFormErrors && !mUserEdit.mStudentRegistrationForm.isForCredit.$valid}" ng-model="mUserEdit.userData.isForCredit" required>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select><br>
+                            <div role="alert" class="help-inline error">
+                                <span class="error" data-ng-show="mUserEdit.showFormErrors && mUserEdit.mStudentRegistrationForm.isForCredit.$error.required">Select credit status.</span>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="comment">Comment:</label>
+                <textarea type="text" class="form-control ng-class:{'error':mUserEdit.showFormErrors && !mUserEdit.mStudentRegistrationForm.comment.$valid}"
+                          placeholder="Comment"
+                          name="comment"
+                          id="comment"
+                          ng-model="mUserEdit.userData.comment"
+                          ng-minlength="2"
+                          required></textarea>
+                <div role="alert" class="help-inline error">
+                    <span class="error" data-ng-show="mUserEdit.showFormErrors && mUserEdit.mStudentRegistrationForm.comment.$error.required">Comment cannot be empty.</span>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">OK</button>
+            <button class="btn btn-warning" ng-click="mUserEdit.cancel()">Cancel</button>
+        </div>
+    </form>
+</script>
+
+<!--Edit modal window form for sections tab-->
+<script type="text/ng-template" id="modalSectionContent.html">
+    <form id="mStudentRegistrationForm" name="mSectionEdit.mStudentRegistrationForm" ng-submit="mSectionEdit.ok()" novalidate>
+        <div class="modal-header">
+            <h3 class="modal-title">Edit</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="control-label" for="enrollmentStatus">Enrollment Status:</label>
+                <p class="input-group">
+                    <select placeholder="Select status" name="enrollmentStatus" class="form-control ng-class:{'error':mSectionEdit.showFormErrors && !mSectionEdit.mStudentRegistrationForm.isForCredit.$valid}" ng-model="mSectionEdit.userData.enrollmentStatusId">
+                        <option>Requested</option>
+                        <option>Approved</option>
+                        <option>Waitlisted</option>
+                        <option>Enrolled</option>
+                        <option>Withdrawn</option>
+                        <option>Completed</option>
+                    </select><br>
+                    <div role="alert" class="help-inline error">
+                        <span class="error" data-ng-show="mSectionEdit.showFormErrors && mSectionEdit.mStudentRegistrationForm.enrollmentStatus.$error.required">Must select an enrollment status.</span>
+                    </div>
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="comment">Comment:</label>
+                <textarea type="text" class="form-control ng-class:{'error':mSectionEdit.showFormErrors && !mSectionEdit.mStudentRegistrationForm.isForCredit.$valid}"
+                          placeholder="Comment"
+                          name="comment"
+                          id="comment"
+                          ng-model="mSectionEdit.userData.comment"
+                          ng-minlength="2"
+                          required></textarea>
+                <div role="alert" class="help-inline error">
+                    <span class="error" data-ng-show="mSectionEdit.showFormErrors && mSectionEdit.mStudentRegistrationForm.comment.$error.required">Must provide a comment.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-primary">OK</button>
+            <button class="btn btn-warning" ng-click="mSectionEdit.cancel()">Cancel</button>
+        </div>
+    </form>
+</script>
+
+@section Scripts {
+    <script src="~/Scripts/datalus.services.sections.js"></script>
+    <script src="~/Scripts/datalus.services.userSection.js"></script>
+    <script src="~/Scripts/datalus.services.userProfile.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+
+    <script type="text/javascript">
+
+        //Client Side routing settings
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .config(["$routeProvider", "$locationProvider", function ($routeProvider, $locationProvider) {
+                    $routeProvider.when('/users', {
+                        templateUrl: '/templates/users.html',
+                        controller: 'userSection_UserController',
+                        controllerAs: 'userController'
+                    }).when('/sections', {
+                        templateUrl: '/templates/sections.html',
+                        controller: 'userSection_SectionController',
+                        controllerAs: 'sectionController'
+                    });
+                    $locationProvider.html5Mode(false);
+                }]);
+
+        })();
+
+        //Angular usersection service
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .factory("$userSectionService", UserSectionServiceFactory);
+
+            UserSectionServiceFactory.$inject = ["$baseService", "$datalus"];
+
+            function UserSectionServiceFactory($baseService, $datalus) {
+                var aDatalusServiceObject = datalus.services.userSection;
+
+                var newService = $baseService.merge(true, {}, aDatalusServiceObject, $baseService);
+
+                console.log("section registration service", aDatalusServiceObject);
+
+                return newService;
+            }
+        })();
+
+        //Angular section service
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .factory('$sectionService', SectionServiceFactory);
+
+            SectionServiceFactory.$inject = ['$baseService', '$datalus'];
+
+            function SectionServiceFactory($baseService, $datalus) {
+                var sectionServiceObject = datalus.services.sections;
+
+                var newService = $baseService.merge(true, {}, sectionServiceObject, $baseService);
+
+                console.log("Section Service", sectionServiceObject);
+
+                return newService;
+            }
+
+        })();
+
+        //Angular userprofile service
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .factory('$userProfileService', UserProfileServiceFactory);
+
+            UserProfileServiceFactory.$inject = ['$baseService', '$datalus'];
+
+            function UserProfileServiceFactory($baseService, $datalus) {
+                var userProfileServiceObject = datalus.services.userProfile;
+                var newService = $baseService.merge(true, {}, userProfileServiceObject, $baseService);
+
+                return newService;
+            }
+
+        })();
+
+        //Angular client side routing controller
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller("routeController", RouteController);
+
+            RouteController.$inject = ["$scope", "$baseController"];
+
+            function RouteController($scope, $baseController) {
+                var vm = this;
+
+                vm.$scope = $scope;
+
+                vm.tabClass = _tabClass;
+                vm.setSelectedTab = _setSelectedTab;
+
+
+                vm.tabs = [
+                        { link: "#/users", label: "Students" },
+                        { link: "#/sections", label: "Sections" }
+                ];
+
+                vm.selectedTab = vm.tabs[0];
+
+                $baseController.merge(vm, $baseController);
+
+                function _tabClass(tab) {
+                    if (vm.selectedTab == tab) {
+                        return "active";
+                    } else {
+                        return "";
+                    }
+                }
+
+                function _setSelectedTab(tab) {
+                    console.log("set selected tab", tab);
+                    vm.selectedTab = tab;
+                }
+            }
+        })();
+
+        //Angular User Controller for students tab
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller("userSection_UserController", UserSection_UserController);
+
+            UserSection_UserController.$inject = ["$scope", "$baseController", "$userSectionService", "$sectionService", "$userProfileService", "$uibModal"];
+
+            function UserSection_UserController($scope, $baseController, $userSectionService, $sectionService, $userProfileService, $uibModal) {
+                var vm = this;
+                vm.sections = null;
+                vm.userProfiles = null;
+                vm.modalItems = null;
+                vm.selectedItem = {};
+
+                vm.$sectionService = $sectionService;
+                vm.$userProfileService = $userProfileService;
+                vm.$userSectionService = $userSectionService;
+                vm.$scope = $scope;
+                vm.$uibModal = $uibModal;
+
+                vm.receiveSections = _receiveSections;
+                vm.receiveUsers = _receiveUsers;
+                vm.selectedUser = _selectedUser;
+                vm.userSectionError = _userSectionError;
+                vm.openModal = _openModal;
+                vm.onEdit = _onEdit;
+                vm.onSuccess = _onSuccess;
+                vm.updateRecord = _updateRecord;
+                vm.successUpdate = _successUpdate;
+
+                $baseController.merge(vm, $baseController);
+
+                vm.notify = vm.$userSectionService.getNotifier($scope);
+
+                render();
+
+                function render() {
+                    vm.$userProfileService.getAll(vm.receiveUsers, vm.userSectionError);
+                }
+
+                function _receiveUsers(data) {
+                    vm.notify(function () {
+                        vm.userProfiles = data.items;
+                    })
+                }
+
+                function _receiveSections(data) {
+                    vm.notify(function () {
+                        vm.sections = data.items;
+                    })
+                }
+
+                $scope.onSelect = function ($item, $model, $label) {
+                    $scope.$selection_made = $item;
+                };
+
+                function _userSectionError(jqXhr, error) {
+                    vm.$alertService.error("An Error Occurred");
+                    console.error(error);
+                }
+
+                function _selectedUser(item) {
+                    vm.$userSectionService.getSectionsByUserProfileId(item, vm.receiveSections, vm.sectionError);
+                }
+
+                function _onEdit(userProfileId, sectionId) {
+                    //make ajax call
+                    vm.$userSectionService.getSpecificUser(userProfileId, sectionId, vm.onSuccess, vm.userSectionError);
+                }
+
+                function _onSuccess(data) {
+                    vm.selectedItem = data.item;
+                    vm.selectedItem.isForCredit = vm.selectedItem.isForCredit.toString();
+
+                    _openModal(vm.selectedItem);
+
+                }
+
+                function _updateRecord() {
+                    vm.$userSectionService.update(vm.selectedItem, vm.selectedItem.userProfileId, vm.selectedItem.sectionId, vm.successUpdate, vm.userSectionError);
+                }
+
+                function _successUpdate() {
+                    _selectedUser(vm.selectedItem.userProfileId);
+                    console.log("successful update");
+                    vm.$alertService.success("Record Updated Successfully");
+                }
+
+
+                function _openModal(data) {
+                    var modalInstance = vm.$uibModal.open({
+                        animation: true,
+                        templateUrl: 'modalUserContent.html',       //  this tells it what html template to use. it must exist in a script tag OR external file
+                        controller: 'modalUserController as mUserEdit',    //  this controller must exist and be registered with angular for this to work
+                        size: 'sm',
+                        resolve: {  //  anything passed to resolve can be injected into the modal controller as shown below
+                            items: function () {
+                                //pass as an object contains userProfileId and sectionId, return that vm object; accessible within the modal controller
+
+                                return data;
+
+                            }
+                        }
+                    });
+
+                    modalInstance.result.then(function () {
+                        _updateRecord();
+                    })
+                }
+
+                vm.$scope.$on('refreshUsers', function (event, obj) {
+                    _selectedUser(obj.userProfileId);
+                })
+            }
+        })();
+
+        //Angular Section Controller for sections tab
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller('userSection_SectionController', UserSection_SectionController);
+
+            UserSection_SectionController.$inject = ["$scope", "$baseController", "$userSectionService", "$sectionService", "$userProfileService", "$uibModal"];
+
+            function UserSection_SectionController($scope, $baseController, $userSectionService, $sectionService, $userProfileService, $uibModal) {
+                var vm = this;
+                vm.sections = null;
+                vm.userProfiles = null;
+                vm.capacity = null;
+                vm.availableSeats = null;
+
+                vm.$sectionService = $sectionService;
+                vm.$userProfileService = $userProfileService;
+                vm.$userSectionService = $userSectionService;
+                vm.$scope = $scope;
+                vm.$uibModal = $uibModal;
+
+                vm.receiveSections = _receiveSections;
+                vm.receiveUsers = _receiveUsers;
+                vm.selectedSection = _selectedSection;
+                vm.userSectionError = _userSectionError;
+                vm.onEdit = _onEdit;
+                vm.onSuccess = _onSuccess;
+                vm.openModal = _openModal;
+                vm.updateRecord = _updateRecord;
+                vm.successUpdate = _successUpdate;
+                vm.capacityInfo = _capacityInfo;
+
+                $baseController.merge(vm, $baseController);
+
+                vm.notify = vm.$userSectionService.getNotifier($scope);
+
+                render();
+
+                function render() {
+                    vm.$sectionService.getAll(vm.receiveSections, vm.sectionError);
+                }
+
+                function _receiveSections(data) {
+                    vm.notify(function () {
+                        vm.sections = data.items;
+                    })
+                }
+
+                function _selectedSection(item) {
+                    vm.$userSectionService.getUsersBySectionId(item, vm.receiveUsers, vm.userSectionError);
+                    vm.$userSectionService.getCapacityBySectionId(item, vm.capacityInfo, vm.userSectionError);
+                }
+
+                function _receiveUsers(data) {
+                    vm.notify(function () {
+                        vm.userProfiles = data.items;
+                    })
+                }
+
+                function _capacityInfo(data) {
+                    vm.notify(function () {
+                        vm.capacity = data.item.section.capacity;
+                        vm.totalEnrolled = data.item.totalEnrolled;
+                        vm.availableSeats = vm.capacity - vm.totalEnrolled;
+                    })
+                }
+
+                function _userSectionError(jqXhr, error) {
+                    vm.$alertService.error("An error Occurred");
+                    console.error(error);
+                }
+
+                function _onEdit(userProfileId, sectionId) {
+                    //make ajax call
+                    vm.$userSectionService.getSpecificUser(userProfileId, sectionId, vm.onSuccess, vm.userSectionError);
+                }
+
+                function _onSuccess(data) {
+                    vm.selectedItem = data.item;
+                    vm.selectedItem.isForCredit = vm.selectedItem.isForCredit.toString();
+
+                    _openModal(vm.selectedItem);
+
+                }
+
+                function _updateRecord() {
+                    vm.$userSectionService.update(vm.selectedItem, vm.selectedItem.userProfileId, vm.selectedItem.sectionId, vm.successUpdate, vm.userSectionError);
+                }
+
+                function _successUpdate() {
+                    _selectedSection(vm.selectedItem.sectionId);
+                    console.log("successful update");
+                    vm.$alertService.success("Record Updated Successfully");
+                }
+
+                function _openModal(data) {
+                    var modalInstance = vm.$uibModal.open({
+                        animation: true,
+                        templateUrl: 'modalSectionContent.html',       //  this tells it what html template to use. it must exist in a script tag OR external file
+                        controller: 'modalSectionController as mSectionEdit',    //  this controller must exist and be registered with angular for this to work
+                        size: 'sm',
+                        resolve: {  //  anything passed to resolve can be injected into the modal controller as shown below
+                            items: function () {
+                                //pass as an object contains userProfileId and sectionId, return that vm object; accessible within the modal controller
+
+                                return data;
+
+                            }
+                        }
+                    });
+
+                    modalInstance.result.then(function () {
+                        _updateRecord();
+                    })
+                }
+
+                vm.$scope.$on('refreshSections', function (event, obj) {
+                    _selectedSection(obj.sectionId);
+                })
+            }
+        })();
+
+        //Register student from student tab
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller('formStudentController', FormStudentController);
+
+            FormStudentController.$inject = ['$scope', '$baseController', "$userProfileService", "$userSectionService", "$sectionService"];
+
+            function FormStudentController($scope, $baseController, $userProfileService, $userSectionService, $sectionService) {
+                var vm = this;
+                vm.formVisibility = false;
+                vm.userProfiles = null;
+                vm.sections = null;
+                //object sent to dB
+                vm.registerNewStudent = null;
+                //validation object
+                vm.studentRegistrationForm = null;
+                vm.showFormErrors = false;
+
+                vm.$scope = $scope;
+                vm.$userProfileService = $userProfileService;
+                vm.$userSectionService = $userSectionService;
+                vm.$sectionService = $sectionService;
+
+                vm.showForm = _showForm;
+                vm.resetForm = _resetForm;
+                vm.receiveUsers = _receiveUsers;
+                vm.receiveSections = _receiveSections;
+                vm.userSectionError = _userSectionError;
+                vm.onRegisterStudent = _onRegisterStudent;
+                vm.registerSuccess = _registerSuccess;
+
+                $baseController.merge(vm, $baseController);
+
+                vm.notify = vm.$userSectionService.getNotifier($scope);
+
+                render();
+
+                function render() {
+                    vm.$userProfileService.getAll(vm.receiveUsers, vm.userSectionError);
+                    vm.$sectionService.getAll(vm.receiveSections, vm.userSectionError);
+                }
+
+
+                function _receiveUsers(data) {
+                    vm.notify(function () {
+                        vm.userProfiles = data.items;
+                    })
+                }
+
+                function _receiveSections(data) {
+                    vm.notify(function () {
+                        vm.sections = data.items;
+                    })
+                }
+
+                function _onRegisterStudent() {
+                    vm.showFormErrors = true;
+                    if (vm.studentRegistrationForm.$valid) {
+                        vm.$userSectionService.create(vm.registerNewStudent, vm.registerSuccess, vm.userSectionError);
+                    } else {
+                        console.log("Not all form values provided.");
+                    }
+                }
+
+                function _registerSuccess() {
+                    console.log("success");
+
+                    vm.$scope.$emit('refreshUsers', {
+                        userProfileId: vm.registerNewStudent.userProfileId
+                    });
+
+                    _resetForm();
+                    vm.$alertService.success("Student Registered Successfully");
+                }
+
+                function _userSectionError(jqXhr, error) {
+                    vm.$alertService.error("An Error Occurred");
+                    console.error(error);
+                }
+
+                function _showForm() {
+                    vm.formVisibility = !vm.formVisibility;
+                }
+
+                function _resetForm() {
+                    vm.formVisibility = false;
+                    vm.showFormErrors = false;
+                    vm.registerNewStudent = null;
+                    vm.studentRegistrationForm.$setPristine();
+                    vm.studentRegistrationForm.$setUntouched()
+                }
+            }
+        })();
+
+        //Register student from section tab
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller('formSectionController', FormSectionController);
+
+            FormSectionController.$inject = ['$scope', '$baseController', "$userProfileService", "$userSectionService", "$sectionService"];
+
+            function FormSectionController($scope, $baseController, $userProfileService, $userSectionService, $sectionService) {
+                var vm = this;
+                vm.formVisibility = false;
+                vm.userProfiles = null;
+                vm.sections = null;
+                //object sent to dB
+                vm.registerNewStudent = null;
+                //validation object
+                vm.studentRegistrationForm = null;
+                vm.showFormErrors = false;
+
+                vm.$scope = $scope;
+                vm.$userProfileService = $userProfileService;
+                vm.$userSectionService = $userSectionService;
+                vm.$sectionService = $sectionService;
+
+                vm.showForm = _showForm;
+                vm.resetForm = _resetForm;
+                vm.receiveUsers = _receiveUsers;
+                vm.receiveSections = _receiveSections;
+                vm.userSectionError = _userSectionError;
+                vm.onRegisterStudent = _onRegisterStudent;
+                vm.registerSuccess = _registerSuccess;
+
+                $baseController.merge(vm, $baseController);
+
+                vm.notify = vm.$userSectionService.getNotifier($scope);
+
+                render();
+
+                function render() {
+                    vm.$userProfileService.getAll(vm.receiveUsers, vm.userSectionError);
+                    vm.$sectionService.getAll(vm.receiveSections, vm.userSectionError);
+                }
+
+
+                function _receiveUsers(data) {
+                    vm.notify(function () {
+                        vm.userProfiles = data.items;
+                    })
+                }
+
+                function _receiveSections(data) {
+                    vm.notify(function () {
+                        vm.sections = data.items;
+                    })
+                }
+
+                function _onRegisterStudent() {
+                    vm.showFormErrors = true;
+                    if (vm.studentRegistrationForm.$valid) {
+                        vm.$userSectionService.create(vm.registerNewStudent, vm.registerSuccess, vm.userSectionError);
+                    } else {
+                        console.log("Not all form values provided.");
+                    }
+                }
+
+                function _registerSuccess() {
+                    console.log("success");
+
+                    vm.$scope.$emit('refreshSections', {
+                        sectionId: vm.registerNewStudent.SectionId
+                    });
+
+                    _resetForm();
+                    vm.$alertService.success("Student Registered Successfully");
+                }
+
+                function _userSectionError(jqXhr, error) {
+                    vm.$alertService.error("An Error Occurred");
+                    console.error(error);
+                }
+
+                function _showForm() {
+                    vm.formVisibility = !vm.formVisibility;
+                }
+
+                function _resetForm() {
+                    vm.formVisibility = false;
+                    vm.registerNewStudent = null;
+                    vm.showFormErrors = false;
+                    vm.studentRegistrationForm.$setPristine();
+                    vm.studentRegistrationForm.$setUntouched()
+                }
+            }
+        })();
+
+        //Modal User controller
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller('modalUserController', ModalUserController);
+
+            //  $uibModalInstance is coming from the UI Bootstrap library and is a reference to the modal window itself so we can work with it
+            //  items is the array passed in from the main controller above through the resolve property
+            ModalUserController.$inject = ['$scope', '$baseController', '$uibModalInstance', '$userSectionService', 'items']
+
+            function ModalUserController(
+                $scope
+                , $baseController
+                , $uibModalInstance
+                , $userSectionService
+                , items) {
+
+                var vm = this;
+                vm.userData = null;
+                vm.userProfileId = null;
+                vm.sectionId = null;
+                //validation object
+                vm.mStudentRegistrationForm = null;
+                vm.showFormErrors = false;
+
+                vm.$scope = $scope;
+                vm.$uibModalInstance = $uibModalInstance;
+                vm.$userSectionService = $userSectionService;
+
+                vm.userData = items;
+
+                $baseController.merge(vm, $baseController);
+
+                //  $uibModalInstance is used to communicate and send data back to main controller
+                vm.ok = function () {
+                    vm.showFormErrors = true;
+                    if (vm.mStudentRegistrationForm.$valid) {
+                        vm.$uibModalInstance.close(vm.mStudentRegistrationForm);
+                    } else {
+                        console.log("validation failed");
+                    }
+                };
+
+                vm.cancel = function () {
+                    vm.$uibModalInstance.dismiss('cancel');
+                };
+
+            }
+        })();
+
+        //Modal Section controller
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller('modalSectionController', ModalSectionController);
+
+            //  $uibModalInstance is coming from the UI Bootstrap library and is a reference to the modal window itself so we can work with it
+            //  items is the array passed in from the main controller above through the resolve property
+            ModalSectionController.$inject = ['$scope', '$baseController', '$uibModalInstance', '$userSectionService', 'items']
+
+            function ModalSectionController(
+                $scope
+                , $baseController
+                , $uibModalInstance
+                , $userSectionService
+                , items) {
+
+                var vm = this;
+                vm.userData = null;
+                vm.userProfileId = null;
+                vm.sectionId = null;
+                //validation object
+                vm.mStudentRegistrationForm = null;
+                vm.showFormErrors = false;
+
+                vm.$scope = $scope;
+                vm.$uibModalInstance = $uibModalInstance;
+                vm.$userSectionService = $userSectionService;
+
+                vm.userData = items;
+
+                $baseController.merge(vm, $baseController);
+
+                //  $uibModalInstance is used to communicate and send data back to main controller
+                vm.ok = function () {
+                    vm.showFormErrors = true;
+                    if (vm.mStudentRegistrationForm.$valid) {
+                        vm.$uibModalInstance.close(vm.mStudentRegistrationForm);
+                    } else {
+                        console.log("validation failed");
+                    }
+                };
+
+                vm.cancel = function () {
+                    vm.$uibModalInstance.dismiss('cancel');
+                };
+            }
+        })();
+
+    </script>
+}
