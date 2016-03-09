@@ -1,0 +1,45 @@
+<!--Edit modal window form for sections tab-->
+<script type="text/ng-template" id="modalSectionContent.html">
+    <form id="mStudentRegistrationForm" name="mSectionEdit.mStudentRegistrationForm" ng-submit="mSectionEdit.ok()" novalidate>
+        <div class="modal-header">
+            <h3 class="modal-title">Edit</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="control-label" for="enrollmentStatus">Enrollment Status:</label>
+                <p class="input-group">
+                    <select placeholder="Select status" name="enrollmentStatus" class="form-control ng-class:{'error':mSectionEdit.showFormErrors && !mSectionEdit.mStudentRegistrationForm.isForCredit.$valid}" ng-model="mSectionEdit.userData.enrollmentStatusId">
+                        <option>Requested</option>
+                        <option>Approved</option>
+                        <option>Waitlisted</option>
+                        <option>Enrolled</option>
+                        <option>Withdrawn</option>
+                        <option>Completed</option>
+                    </select><br>
+                    <div role="alert" class="help-inline error">
+                        <span class="error" data-ng-show="mSectionEdit.showFormErrors && mSectionEdit.mStudentRegistrationForm.enrollmentStatus.$error.required">Must select an enrollment status.</span>
+                    </div>
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="comment">Comment:</label>
+                <textarea type="text" class="form-control ng-class:{'error':mSectionEdit.showFormErrors && !mSectionEdit.mStudentRegistrationForm.isForCredit.$valid}"
+                          placeholder="Comment"
+                          name="comment"
+                          id="comment"
+                          ng-model="mSectionEdit.userData.comment"
+                          ng-minlength="2"
+                          required></textarea>
+                <div role="alert" class="help-inline error">
+                    <span class="error" data-ng-show="mSectionEdit.showFormErrors && mSectionEdit.mStudentRegistrationForm.comment.$error.required">Must provide a comment.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-primary">OK</button>
+            <button class="btn btn-warning" ng-click="mSectionEdit.cancel()">Cancel</button>
+        </div>
+    </form>
+</script>
