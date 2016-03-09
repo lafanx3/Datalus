@@ -1,0 +1,62 @@
+<!--Edit modal window form for students tab-->
+<script type="text/ng-template" id="modalUserContent.html">
+    <form id="mStudentRegistrationForm" name="mUserEdit.mStudentRegistrationForm" ng-submit="mUserEdit.ok()" novalidate>
+        <div class="modal-header">
+            <h3 class="modal-title">Edit</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="control-label" for="enrollmentStatus">Enrollment Status:</label>
+                <p class="input-group">
+                    <select placeholder="Select status" name="enrollmentStatus" class="form-control ng-class:{'error':mUserEdit.showFormErrors && !mUserEdit.mStudentRegistrationForm.enrollmentStatus.$valid}" ng-model="mUserEdit.userData.enrollmentStatusId" required>
+                        <option>Requested</option>
+                        <option>Approved</option>
+                        <option>Waitlisted</option>
+                        <option>Enrolled</option>
+                        <option>Withdrawn</option>
+                        <option>Completed</option>
+                    </select><br>
+                    <div role="alert" class="help-inline error">
+                        <span class="error" data-ng-show="mUserEdit.showFormErrors && mUserEdit.mStudentRegistrationForm.enrollmentStatus.$error.required">Select enrollment status.</span>
+                    </div>
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="isForCredit">Is For Credit:</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="input-group">
+                            <select name="isForCredit" class="form-control ng-class:{'error':mUserEdit.showFormErrors && !mUserEdit.mStudentRegistrationForm.isForCredit.$valid}" ng-model="mUserEdit.userData.isForCredit" required>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select><br>
+                            <div role="alert" class="help-inline error">
+                                <span class="error" data-ng-show="mUserEdit.showFormErrors && mUserEdit.mStudentRegistrationForm.isForCredit.$error.required">Select credit status.</span>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="comment">Comment:</label>
+                <textarea type="text" class="form-control ng-class:{'error':mUserEdit.showFormErrors && !mUserEdit.mStudentRegistrationForm.comment.$valid}"
+                          placeholder="Comment"
+                          name="comment"
+                          id="comment"
+                          ng-model="mUserEdit.userData.comment"
+                          ng-minlength="2"
+                          required></textarea>
+                <div role="alert" class="help-inline error">
+                    <span class="error" data-ng-show="mUserEdit.showFormErrors && mUserEdit.mStudentRegistrationForm.comment.$error.required">Comment cannot be empty.</span>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">OK</button>
+            <button class="btn btn-warning" ng-click="mUserEdit.cancel()">Cancel</button>
+        </div>
+    </form>
+</script>
