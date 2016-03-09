@@ -1,0 +1,58 @@
+<!--View for users tab-->
+<script type="text/ng-template" id="/templates/users.html">
+    <form id="userRegistrationForm" name="userController.userRegistrationForm" novalidate>
+        <label class="control-label" for="UserProfileId">Students:<strong> {{$selection_made.firstName}} {{$selection_made.lastName}}</strong></label>
+        <input type="text"
+               data-ng-model="userController.userProfileSelection.userProfileId"
+               placeholder="Enter First Name, Last Name or email address"
+               uib-typeahead="userProfile.id as (userProfile.firstName + ' ' + userProfile.lastName + ' ' + userProfile.userName) for userProfile in userController.userProfiles | filter:$viewValue"
+               typeahead-loading="loadingProfile"
+               typeahead-no-results="noResults"
+               typeahead-on-select='onSelect($item, $model, $label)'
+               typeahead-input-formatter="userController.selectedUser(userController.userProfileSelection.userProfileId)"
+               typeahead-append-to-body="true"
+               typeahead-min-length=2
+               class="form-control">
+        <i ng-show="loadingProfile"
+           class="glyphicon glyphicon-refresh"></i>
+        <div ng-show="noResults">
+            <i class="glyphicon glyphicon-remove"></i> No Results Found
+        </div>
+        <br />
+
+        <div class="form-group">
+            <label class="control-label" for="sectionId">Sections:</label>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Section Number</th>
+                        <th>Section Name</th>
+                        <th>Enrollment Status</th>
+                        <th>Is For Credit</th>
+                        <th>Comment</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="section in userController.sections">
+                        <td>{{section.section.sectionNumberId}}</td>
+                        <td>{{section.section.title}}</td>
+                        <td>{{section.enrollmentStatusId}}</td>
+                        <td><input type="checkbox" ng-checked="{{section.isForCredit}}" disabled /></td>
+                        <td>{{section.comment}}</td>
+                        <td><button class="btn-block btn-success" type="button" ng-click="userController.onEdit(userController.userProfileSelection.userProfileId, section.sectionId)">Edit</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <div ng-controller="formStudentController as dashboard">
+        <button type="button" ng-if="!dashboard.formVisibility" ng-click="dashboard.showForm()" class="btn btn-info">Add Student</button>
+        <div data-init-panel="true" class="panel fade in panel-default panel-fill" data-fill-color="true">
+            <div class="panel-heading" ng-if="dashboard.formVisibility" ng-include="'/formStudent.html'">
+
+            </div>
+        </div>
+    </div>
+
+</script>
