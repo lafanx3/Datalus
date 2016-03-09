@@ -1,0 +1,21 @@
+@{
+    ViewBag.Title = "Section Registration";
+}
+
+<h2>User Sections</h2>
+
+<div class="panel-heading" ng-include="'/userSections.html'"></div>
+
+<script type="text/ng-template" id="/userSections.html">
+<ul class="nav nav-tabs" ng-controller="routeController as main">
+    <li ng-class="main.tabClass(tab)" ng-repeat="tab in main.tabs">
+        <a href="{{tab.link}}" ng-click="main.setSelectedTab(tab)">{{tab.label}}</a>
+    </li>
+</ul>
+</script>
+<!--this html for angular routing-->
+<div data-init-panel="true" class="panel fade in panel-default panel-fill" data-fill-color="true">
+    <div class="panel-heading">
+        <div ng-view></div>
+    </div>
+</div>
