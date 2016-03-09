@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Data.SqlClient;
-using Datalus.Data;
-using Datalus.Web.Models.Requests;
-using Datalus.Web.Domain;
+using Sabio.Data;
+using Sabio.Web.Models.Requests;
+using Sabio.Web.Domain;
 using System.Data;
-using Datalus.Web.Enums;
+using Sabio.Web.Enums;
 
-namespace Datalus.Web.Services
+namespace Sabio.Web.Services
 {
-    public class UserSectionService : BaseService
+    public class UserSectionService : BaseService, IUserSectionService
     {
-        public static void Insert(UserSectionAddRequest model)
+        public void Insert(UserSectionAddRequest model)
         {
             string userId = UserService.GetCurrentUserId();
 
@@ -30,7 +30,7 @@ namespace Datalus.Web.Services
                 );
         }
 
-        public static List<UserSection> GetSectionsByUserProfileId(int id)
+        public List<UserSection> GetSectionsByUserProfileId(int id)
         {
             List<UserSection> userSections = null;
 
@@ -42,46 +42,29 @@ namespace Datalus.Web.Services
                , map: delegate (IDataReader reader, short resultSetNumber)
                {
                    int columnOrdPosition = 0;
-                   UserSection section = new UserSection();
-                   section.Section = new Section();
+                   UserSection userSection = new UserSection();
+                   userSection.Section = new Section();
                    if (resultSetNumber == 0)
                    {
-                       section.UserProfileId = reader.GetSafeInt32(columnOrdPosition++);
-                       section.SectionId = reader.GetSafeInt32(columnOrdPosition++);
-                       section.Section.SectionNumberId = reader.GetSafeString(columnOrdPosition++);
-                       section.Section.Title = reader.GetSafeString(columnOrdPosition++);
-                       section.EnrollmentStatusId = (EnrollmentStatus)reader.GetSafeInt32(columnOrdPosition++);
-                       section.IsForCredit = reader.GetSafeBool(columnOrdPosition++);
-                       section.Comment = reader.GetSafeString(columnOrdPosition++);
+                       userSection.UserProfileId = reader.GetSafeInt32(columnOrdPosition++);
+                       userSection.SectionId = reader.GetSafeInt32(columnOrdPosition++);
+                       userSection.Section.SectionNumberId = reader.GetSafeString(columnOrdPosition++);
+                       userSection.Section.Title = reader.GetSafeString(columnOrdPosition++);
+                       userSection.EnrollmentStatusId = (EnrollmentStatus)reader.GetSafeInt32(columnOrdPosition++);
+                       userSection.IsForCredit = reader.GetSafeBool(columnOrdPosition++);
+                       userSection.Comment = reader.GetSafeString(columnOrdPosition++);
                    }
-                   //else if (resultSetNumber == 1)
-                   //{
-                   //    section.Section.Id = reader.GetSafeInt32(columnOrdPosition++);
-                   //    section.Section.SectionNumberId = reader.GetSafeInt32(columnOrdPosition++);
-                   //    section.Section.Credits = reader.GetSafeInt32(columnOrdPosition++);
-                   //    section.Section.Title = reader.GetSafeString(columnOrdPosition++);
-                   //    section.Section.DayOffered = reader.GetSafeString(columnOrdPosition++);
-                   //    section.Section.StartTime = reader.GetSafeDateTime(columnOrdPosition++);
-                   //    section.Section.Capacity = reader.GetSafeInt32(columnOrdPosition++);
-                   //    section.Section.StartDate = reader.GetSafeDateTime(columnOrdPosition++);
-                   //    section.Section.EndDate = reader.GetSafeDateTime(columnOrdPosition++);
-                   //    section.Section.Instructor = new InstructorBase();
-                   //    section.Section.Instructor.id = reader.GetSafeInt32(columnOrdPosition++);
-                   //    section.Section.Campus = new Campus();
-                   //    section.Section.Campus.Id = reader.GetSafeInt32(columnOrdPosition++);
-                   //}
-
                    if (userSections == null)
                    {
                        userSections = new List<UserSection>();
                    }
-                   userSections.Add(section);
+                   userSections.Add(userSection);
                });
 
             return userSections;
         }
 
-        public static List<UserSection> GetUsersBySectionId(int id)
+        public List<UserSection> GetUsersBySectionId(int id)
         {
             List<UserSection> users = null;
 
@@ -114,7 +97,7 @@ namespace Datalus.Web.Services
             return users;
         }
 
-        public static UserSection GetSpecificUser(int userProfileId, int sectionId)
+        public UserSection GetSpecificUser(int userProfileId, int sectionId)
         {
             UserSection userSection = null;
 
@@ -137,7 +120,7 @@ namespace Datalus.Web.Services
             return userSection;
         }
 
-        public static UserSection GetCapacity(int sectionId)
+        public UserSection GetCapacity(int sectionId)
         {
             UserSection user = null;
             DataProvider.ExecuteCmd(GetConnection, "dbo.UserSections_EnrollmentCapacity"
@@ -161,7 +144,7 @@ namespace Datalus.Web.Services
         }
 
 
-        public static void Update(UserSectionUpdateRequest model, int userProfileId, int sectionId)
+        public void Update(UserSectionUpdateRequest model, int userProfileId, int sectionId)
         {
             DataProvider.ExecuteNonQuery(GetConnection, "dbo.UserSections_UpdateUser"
                 , inputParamMapper: delegate (SqlParameterCollection paramCollection)
