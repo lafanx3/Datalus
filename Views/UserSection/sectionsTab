@@ -1,0 +1,68 @@
+<!--View for sections tab-->
+<script type="text/ng-template" id="/templates/sections.html">
+    <form id="sectionRegistrationForm" name="sectionController.sectionRegistrationForm" novalidate>
+        <div class="panel-control pull-right">
+            <div data-init-panel="true" class="panel fade in panel-dark" data-context="dark">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Max Capacity</h4>
+                </div><!-- /.panel-heading -->
+                <div class="panel-body">
+                    <strong><p class="text-center panel-title">{{sectionController.capacity}}</p></strong>
+                </div><!-- /.panel-body -->
+            </div><!-- /.panel -->
+        </div>
+        <div class="panel-control pull-right">
+            <div data-init-panel="true" class="panel fade in panel-dark" data-context="dark">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Seats Available</h4>
+                </div><!-- /.panel-heading -->
+                <div class="panel-body">
+                    <strong><p class="text-center panel-title">{{sectionController.availableSeats}}</p></strong>
+                </div><!-- /.panel-body -->
+            </div><!-- /.panel -->
+        </div>
+        <div class="row">
+            <div class="form-group col-md-5">
+                <label class="control-label" for="sectionId">Sections:</label>
+                <select name="sectionId" class="form-control"
+                        id="sectionId"
+                        ng-model="sectionController.sectionSelection.sectionId"
+                        ng-options="section.id as (section.id + ' ' + section.title) for section in sectionController.sections"
+                        ng-change="sectionController.selectedSection(sectionController.sectionSelection.sectionId)">
+                    <option value="">Select a Section</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="sectionId">Students:</label>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Enrollment Status</th>
+                        <th>Comment</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="userProfile in sectionController.userProfiles">
+                        <td>{{userProfile.student.firstName}}</td>
+                        <td>{{userProfile.student.lastName}}</td>
+                        <td>{{userProfile.enrollmentStatusId}}</td>
+                        <td>{{userProfile.comment}}</td>
+                        <td><button class="btn-block btn-success" type="button" ng-click="sectionController.onEdit(userProfile.userProfileId, userProfile.sectionId)">Edit</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <div ng-controller="formSectionController as dashboard">
+        <button type="button" ng-if="!dashboard.formVisibility" ng-click="dashboard.showForm()" class="btn btn-info">Add Student</button>
+        <div data-init-panel="true" class="panel fade in panel-default panel-fill" data-fill-color="true">
+            <div class="panel-heading" ng-if="dashboard.formVisibility" ng-include="'/formSection.html'">
+
+            </div>
+        </div>
+    </div>
+</script>
