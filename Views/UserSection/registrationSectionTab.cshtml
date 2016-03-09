@@ -1,0 +1,67 @@
+<!--Registration form for sections tab-->
+<script type="text/ng-template" id="/formSection.html">
+    <form id="studentRegistrationForm" name="dashboard.studentRegistrationForm" ng-submit="dashboard.onRegisterStudent()" novalidate>
+        <div class="form-group">
+            <label class="control-label" for="UserProfileId">User Profile ID:</label>
+            <select name="userProfileId" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.userProfileId.$valid}"
+                    id="userProfileId"
+                    ng-model="dashboard.registerNewStudent.userProfileId"
+                    ng-options="userProfile.id as (userProfile.firstName + ' ' + userProfile.lastName) for userProfile in dashboard.userProfiles"
+                    ng-change="userController.selectedUser(userController.userProfileSelection.userProfileId)" required>
+                <option value="">Select a Profile</option>
+            </select>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.userProfileId.$error.required">Must select a user.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="sectionId">Section ID:</label>
+            <select name="sectionId" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.sectionId.$valid}"
+                    id="sectionId"
+                    ng-model="dashboard.registerNewStudent.SectionId"
+                    ng-options="section.id as (section.sectionNumberId + ':   ' + section.title) for section in dashboard.sections" required>
+                <option value="">Select a Section</option>
+            </select>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.sectionId.$error.required">Must select a section.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="enrollmentStatus">Enrollment Status:</label>
+            <p class="input-group">
+                <select name="enrollmentStatus" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.enrollmentStatus.$valid}" ng-model="dashboard.registerNewStudent.EnrollmentStatusId" required>
+                    <option value="">Select a Status</option>
+                    <option>Requested</option>
+                    <option>Approved</option>
+                    <option>Waitlisted</option>
+                    <option>Enrolled</option>
+                    <option>Withdrawn</option>
+                    <option>Completed</option>
+                </select>
+                <div role="alert" class="help-inline error">
+                    <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.enrollmentStatus.$error.required">Must select an enrollment status.</span>
+                </div>
+            </p>
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label" for="comment">Comment:</label>
+            <textarea type="text" class="form-control ng-class:{'error':dashboard.showFormErrors && !dashboard.studentRegistrationForm.comment.$valid}"
+                      placeholder="Comment"
+                      name="comment"
+                      id="comment"
+                      ng-model="dashboard.registerNewStudent.Comment"
+                      ng-minlength="2"
+                      required></textarea>
+            <div role="alert" class="help-inline error">
+                <span class="error" data-ng-show="dashboard.showFormErrors && dashboard.studentRegistrationForm.comment.$error.required">Must provide a comment.</span>
+            </div>
+        </div>
+
+        <button type="submit" id="cmdWiki" class="btn btn-success">Add</button>
+        <button type="button" class="btn btn-default" ng-click="dashboard.resetForm()">Cancel</button>
+    </form>
+</script>
