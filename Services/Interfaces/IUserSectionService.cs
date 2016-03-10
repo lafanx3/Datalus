@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Sabio.Web.Domain;
-using Sabio.Web.Models.Requests;
+using Datalus.Web.Domain;
+using Datalus.Web.Models.Requests;
 
-namespace Sabio.Web.Services
+namespace Datalus.Web.Services
 {
     public interface IUserSectionService
     {
