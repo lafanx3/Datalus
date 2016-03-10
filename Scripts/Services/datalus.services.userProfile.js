@@ -2,20 +2,6 @@ if (!datalus.services.userProfile) {
     datalus.services.userProfile = {};
 }
 
-//datalus.services.userProfile.getAll = function (onSuccess, onError) {
-//    var url = "/api/Profile";
-//    var settings = {
-//        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-//        type: "GET",
-//        dataType: "json",
-//        success: onSuccess,
-//        error: onError,
-
-//    };
-
-//    $.ajax(url, settings)
-//}
-
 datalus.services.userProfile.create = function (myData, onCreateSuccess, onCreateError) {
     var url = "/api/Profiles";
     
